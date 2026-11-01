@@ -13,7 +13,8 @@
       ],
       "js": [
         "calendar-url.js",
-        "content.js"
+        "content.js",
+        "copy-link.js"
       ],
       "run_at": "document_start"
     }

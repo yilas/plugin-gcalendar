@@ -139,6 +139,7 @@ await test('Manifest : scripts présents, pas de permissions globales', () => {
   for (const file of [...manifest.content_scripts[0].js, manifest.background.service_worker]) assert.ok(fs.existsSync(path.join(root, file)));
 });
 await require('./preferences.cjs')({ test, load });
+await require('./copy-link.cjs')({ test, load });
 console.log(`${count} tests réussis (environnement simulé, sans session Google Calendar).`);
 
 })().catch(error => { console.error(error); process.exitCode = 1; });
