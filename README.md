@@ -33,4 +33,6 @@ node tests/run.cjs
 
 Toute modification passe par une **PR**, avec des tests unitaires pour chaque changement de code. Voir [AGENTS.md](AGENTS.md).
 
-Test navigateur optionnel : installer Playwright et Chromium (`npm install --no-save playwright`, puis `npx playwright install chromium`), puis lancer `node tests/browser-copy.cjs`. Ce test utilise une page locale simulée et un presse-papiers simulé, sans connexion à Google.
+La pipeline **Regression tests** s’exécute à chaque PR et nouveau commit, quelle que soit la branche cible. Elle lance les tests unitaires et le test Chromium du clic droit (page et presse-papiers simulés, sans connexion à Google).
+
+Pour reproduire la CI : `npm ci`, `npm test`, `npx playwright install --with-deps chromium`, puis `npm run test:browser`. Les dépendances npm servent uniquement aux tests ; l’extension se charge toujours sans compilation.
