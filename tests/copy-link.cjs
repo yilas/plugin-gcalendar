@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const vm = require('node:vm');
 module.exports = async ({test, load}) => {
-  function setup(writeText = async () => {}) {
+  function setup(writeText = async () => {}, simulateFocus = false) {
     const handlers = {}; const nodes = []; const copied = [];
     class El {
       constructor(kind = '', value = '') { this.kind = kind; this.value = value; this.href = value;
@@ -17,7 +17,14 @@ module.exports = async ({test, load}) => {
       attachShadow() { this.shadow = new El(); return this.shadow; }
       addEventListener(type, fn) { this.listeners[type] = fn; }
       remove() { this.isConnected = false; }
-      focus() { this.focused = true; }
+      focus(options) {
+        this.focusOptions = options;
+        if (simulateFocus && doc.activeElement !== this) {
+          handlers.blur?.({ target: doc.activeElement });
+        }
+        doc.activeElement = this;
+        this.focused = true;
+      }
       getBoundingClientRect() { return {left:10,bottom:30,width:240,height:45}; }
     }
     const previous = new El();
@@ -42,6 +49,26 @@ module.exports = async ({test, load}) => {
       host:() => nodes.find(n => n.shadow),
       message:() => nodes.filter(n => n.textContent?.includes('copié') || n.textContent?.includes('impossible')).at(-1) };
   }
+  await test('Régression : le transfert de focus vers le bouton ne ferme pas le menu', async () => {
+    const s = setup(async () => {}, true);
+    s.handlers.contextmenu(s.event());
+    assert.equal(s.host().isConnected, true);
+    await s.button().listeners.click(s.event());
+    assert.equal(s.copied.length, 1);
+  });
+  await test('Régression : blur d’un élément ignoré, blur de la fenêtre ferme le menu', async () => {
+    const s = setup(); s.handlers.contextmenu(s.event());
+    s.handlers.blur({target:s.previous});
+    assert.equal(s.host().isConnected, true);
+    s.handlers.blur({target:s.context.window});
+    assert.equal(s.host().isConnected, false);
+  });
+  await test('Régression : focus et restauration sans défilement', async () => {
+    const s = setup(); s.handlers.contextmenu(s.event());
+    assert.equal(s.button().focusOptions?.preventScroll, true);
+    s.handlers.keydown(s.event(undefined, {key:'Escape'}));
+    assert.equal(s.previous.focusOptions?.preventScroll, true);
+  });
   await test('Copie : bon compte, calendrier et occurrence, confirmation après réussite', async () => {
     const s = setup(); const e = s.event(); s.handlers.contextmenu(e);
     assert.equal(e.prevented,true); assert.equal(s.copied.length,0);
@@ -70,7 +97,7 @@ module.exports = async ({test, load}) => {
   await test('Copie : fermeture par Échap, clic extérieur, défilement et changement de page', async () => {
     for (const type of ['keydown','pointerdown','scroll','popstate','blur','visibilitychange']) {
       const s=setup(); s.handlers.contextmenu(s.event()); s.doc.hidden=true;
-      s.handlers[type](s.event(undefined,{key:'Escape'}));
+      s.handlers[type](s.event(undefined,{key:'Escape',target:s.context.window}));
       assert.equal(s.host().isConnected,false); assert.equal(s.copied.length,0);
     }
   });

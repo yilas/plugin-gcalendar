@@ -6,10 +6,14 @@
   let timer;
   function close(restoreFocus = false) {
     if (!menu) return;
-    menu.remove();
+    // Removing a focused node can dispatch blur synchronously in Chromium.
+    // Clear state first so closing is safe even if an event re-enters it.
+    const closing = menu;
+    const restore = previousFocus;
     menu = null;
-    if (restoreFocus && previousFocus?.isConnected) previousFocus.focus();
     previousFocus = null;
+    closing.remove();
+    if (restoreFocus && restore?.isConnected) restore.focus({ preventScroll: true });
   }
   function inform(text) {
     notice?.remove();
@@ -68,7 +72,7 @@
       : el.getBoundingClientRect();
     menu.style.left = `${Math.max(8, Math.min(anchor.left, innerWidth - rect.width - 8))}px`;
     menu.style.top = `${Math.max(8, Math.min(anchor.bottom, innerHeight - rect.height - 8))}px`;
-    button.focus();
+    button.focus({ preventScroll: true });
   }, { capture: true });
   window.addEventListener("pointerdown", event => {
     if (menu && !event.composedPath().includes(menu)) close();
@@ -79,8 +83,13 @@
       if (event.key === "Escape") { event.preventDefault(); event.stopImmediatePropagation(); }
     }
   }, { capture: true });
-  for (const type of ["scroll", "resize", "blur", "popstate", "hashchange"]) {
+  for (const type of ["scroll", "resize", "popstate", "hashchange"]) {
     window.addEventListener(type, () => close(), { capture: true });
   }
+  // Captured element blur also reaches window: only a window blur means
+  // the user left this window, not that focus moved into our menu.
+  window.addEventListener("blur", event => {
+    if (event.target === window) close();
+  }, { capture: true });
   document.addEventListener("visibilitychange", () => { if (document.hidden) close(); });
 })();

@@ -20,7 +20,7 @@ Aucune compilation ni clé API. Après une mise à jour, rechargez l’extension
 ## Confidentialité et limites
 
 - Fonctionne uniquement sur Google Calendar, sans collecte de données ni serveur tiers.
-- Prototype 0.1.0 : tests locaux simulés ; validation dans Google Calendar réel encore nécessaire, notamment pour les récurrences, calendriers partagés et comptes multiples.
+- Prototype 0.1.1 : tests locaux simulés ; validation dans Google Calendar réel encore nécessaire, notamment pour les récurrences, calendriers partagés et comptes multiples.
 - Dépend de l’interface de Google, qui peut évoluer. Les événements non reconnus, tâches et créneaux vides ne sont pas pris en charge.
 
 ## Tests et contributions
@@ -32,3 +32,5 @@ node tests/run.cjs
 ```
 
 Toute modification passe par une **PR**, avec des tests unitaires pour chaque changement de code. Voir [AGENTS.md](AGENTS.md).
+
+Test navigateur optionnel : installer Playwright et Chromium (`npm install --no-save playwright`, puis `npx playwright install chromium`), puis lancer `node tests/browser-copy.cjs`. Ce test utilise une page locale simulée et un presse-papiers simulé, sans connexion à Google.
