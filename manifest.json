@@ -3,10 +3,26 @@
   "name": "Calendar Plus — clic du milieu",
   "version": "0.1.0",
   "description": "Ouvre les événements Google Calendar dans un onglet en arrière-plan avec le bouton du milieu.",
-  "background": { "service_worker": "background.js" },
-  "content_scripts": [{
-    "matches": ["https://calendar.google.com/calendar/*"],
-    "js": ["calendar-url.js", "content.js"],
-    "run_at": "document_start"
-  }]
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://calendar.google.com/calendar/*"
+      ],
+      "js": [
+        "calendar-url.js",
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_title": "Calendar Plus",
+    "default_popup": "popup.html"
+  }
 }

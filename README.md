@@ -4,6 +4,8 @@ Extension Chrome : **clic du milieu sur un événement Google Calendar → nouve
 
 **Raccourcis :** Ctrl + clic sous Windows/Linux, ⌘ + clic sur Mac. Les combinaisons avec Alt ou Maj conservent leur comportement habituel.
 
+**Ouverture :** depuis l’icône de l’extension, choisissez si le nouvel onglet devient actif. Le choix est mémorisé localement ; arrière-plan par défaut.
+
 ## Installation
 
 1. Clonez le dépôt ou décompressez son ZIP (sélectionnez la branche pour tester une PR).
