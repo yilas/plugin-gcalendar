@@ -36,15 +36,21 @@
     event.preventDefault();
     event.stopImmediatePropagation();
   }
+  function shortcut(event) {
+    const platform = globalThis.navigator?.userAgentData?.platform || globalThis.navigator?.platform || "";
+    const mac = /mac/i.test(platform);
+    return event.button === 0 && !event.altKey && !event.shiftKey &&
+      (mac ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey);
+  }
   // Delegation handles navigation and dynamically inserted calendar events.
   for (const type of ["pointerdown", "mousedown", "mouseup"]) {
     window.addEventListener(type, event => {
-      if (!event.isTrusted || event.button !== 1) return;
+      if (!event.isTrusted || (event.button !== 1 && !shortcut(event))) return;
       if (resolve(event).url) consume(event);
     }, { capture: true, passive: false });
   }
-  window.addEventListener("auxclick", event => {
-    if (!event.isTrusted || event.button !== 1) return;
+  function openEvent(event) {
+    if (!event.isTrusted || !(event.type === "auxclick" ? event.button === 1 : shortcut(event))) return;
     const { url, chip } = resolve(event);
     if (!url) {
       if (chip) inform("Calendar Plus : format d’événement non reconnu. Aucun onglet ouvert.");
@@ -60,5 +66,8 @@
     } catch {
       inform("Calendar Plus : rechargez Google Calendar après la mise à jour de l’extension.");
     }
-  }, { capture: true, passive: false });
+  }
+  for (const type of ["auxclick", "click"]) {
+    window.addEventListener(type, openEvent, { capture: true, passive: false });
+  }
 })();

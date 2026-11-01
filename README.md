@@ -2,6 +2,8 @@
 
 Extension Chrome : **clic du milieu sur un événement Google Calendar → nouvel onglet en arrière-plan**. Le clic gauche reste inchangé. La page native peut afficher l’éditeur selon vos droits ; l’extension ne modifie aucun événement.
 
+**Raccourcis :** Ctrl + clic sous Windows/Linux, ⌘ + clic sur Mac. Les combinaisons avec Alt ou Maj conservent leur comportement habituel.
+
 ## Installation
 
 1. Clonez le dépôt ou décompressez son ZIP (sélectionnez la branche pour tester une PR).

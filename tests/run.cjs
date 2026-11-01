@@ -52,7 +52,7 @@ Object.assign(context, {
 });
 vm.runInContext(load('content.js'), context);
 function event(button, element, trusted = true) {
-  return { button, isTrusted: trusted, prevented: false, stopped: false,
+  return { type: "auxclick", button, isTrusted: trusted, prevented: false, stopped: false,
     composedPath() { return [element]; },
     preventDefault() { this.prevented = true; },
     stopImmediatePropagation() { this.stopped = true; } };
@@ -74,6 +74,36 @@ test('Clics gauche/droit, synthétique, champ, zone vide et lien externe intacts
 test('Identifiant inconnu : aucun onglet', () => {
   handlers.auxclick(event(1, new FakeElement('chip', 'unknown')));
   assert.equal(messages.length, 1);
+});
+
+test('Raccourcis : Ctrl sous Linux/Windows, Cmd sous macOS, un seul message', () => {
+  for (const platform of ['Linux', 'Win32', 'MacIntel']) {
+    context.navigator = { platform };
+    const before = messages.length;
+    const e = Object.assign(event(0, new FakeElement('chip', token)), {
+      type: 'click', ctrlKey: platform !== 'MacIntel', metaKey: platform === 'MacIntel'
+    });
+    handlers.pointerdown(e); handlers.mousedown(e); handlers.mouseup(e); handlers.click(e);
+    assert.equal(messages.length, before + 1); assert.ok(e.prevented);
+  }
+});
+test('Raccourcis : mauvais modificateur, Shift, Alt et clic synthétique ignorés', () => {
+  context.navigator = { platform: 'MacIntel' };
+  const before = messages.length;
+  for (const mods of [{ctrlKey:true}, {metaKey:true,shiftKey:true}, {metaKey:true,altKey:true},
+    {metaKey:true,ctrlKey:true}, {metaKey:true,isTrusted:false}]) {
+    const e = Object.assign(event(0, new FakeElement('chip', token)), {type:'click'}, mods);
+    handlers.click(e); assert.equal(e.prevented, false);
+  }
+  assert.equal(messages.length, before);
+});
+test('Raccourcis : champs et liens externes restent natifs', () => {
+  const before = messages.length;
+  for (const element of [new FakeElement('input'), new FakeElement('link', 'https://example.com')]) {
+    const e = Object.assign(event(0, element), {type:'click', metaKey:true});
+    handlers.click(e); assert.equal(e.prevented, false);
+  }
+  assert.equal(messages.length, before);
 });
 
 let receive;
