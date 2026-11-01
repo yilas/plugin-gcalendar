@@ -6,6 +6,8 @@ Extension Chrome : **clic du milieu sur un événement Google Calendar → nouve
 
 **Ouverture :** depuis l’icône de l’extension, choisissez si le nouvel onglet devient actif. Le choix est mémorisé localement ; arrière-plan par défaut.
 
+**Copie du lien :** clic droit sur un événement reconnu → « Copier le lien de l’événement ». Maj + clic droit conserve le menu habituel. Copier un lien ne donne aucun droit d’accès au destinataire.
+
 ## Installation
 
 1. Clonez le dépôt ou décompressez son ZIP (sélectionnez la branche pour tester une PR).
