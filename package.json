@@ -1,0 +1,13 @@
+{
+  "name": "calendar-plus",
+  "version": "0.1.1",
+  "private": true,
+  "scripts": {
+    "test": "node tests/run.cjs && node --test tests/ci.test.cjs",
+    "test:browser": "node tests/browser-copy.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "yaml": "2.8.1"
+  }
+}
