@@ -11,9 +11,9 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
     return false;
   }
   // tabs.create does not need the broad "tabs" permission.
-  chrome.tabs.create({
-    url: target, active: false, windowId: sender.tab.windowId,
+  chrome.storage.local.get("openInForeground").catch(() => ({})).then(settings => chrome.tabs.create({
+    url: target, active: settings.openInForeground === true, windowId: sender.tab.windowId,
     openerTabId: sender.tab.id
-  }).then(() => respond({ ok: true }), () => respond({ ok: false }));
+  })).then(() => respond({ ok: true }), () => respond({ ok: false }));
   return true;
 });
